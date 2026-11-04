@@ -3,7 +3,8 @@ from django.contrib import messages
 from django.db.models import ProtectedError
 from .models import Libro, Categoria, Editorial, Autor
 from .forms import LibroForm, CategoriaForm, EditorialForm, AutorForm
-
+from registro.models import Perfil
+from django.contrib.auth.decorators import login_required
 
 #LIBROS
 def lista_libros(request):
@@ -11,7 +12,12 @@ def lista_libros(request):
     libro = Libro.objects.all()
     return render(request, 'catalogo/libro/libro_list.html', {'libros': libro})
 
+# Verificar que el usuario inició sesión
+@login_required
 def crear_libros(request):
+    perfil  = get_object_or_404(Perfil, user = request.user)
+    if perfil.rol.nombre != 'Bibliotecario':
+        return redirect('lista_libros')
     #request.FILES es necesario para recibir la imagen de portada
     form = LibroForm(request.POST or None, request.FILES or None)
     if request.method == 'POST':
@@ -23,7 +29,11 @@ def crear_libros(request):
     #sino se renderiza al formulario del libro
     return render(request, 'catalogo/libro/libro_form.html', {'form': form, 'accion': 'Crear'})
 
+@login_required
 def editar_libros(request, pk):
+    perfil  = get_object_or_404(Perfil, user = request.user)
+    if perfil.rol.nombre != 'Bibliotecario':
+        return redirect('lista_libros')
     libro = get_object_or_404(Libro, pk=pk)
     form = LibroForm(request.POST or None, request.FILES or None, instance=libro)
     if request.method == 'POST':
@@ -35,7 +45,11 @@ def editar_libros(request, pk):
     #sino se renderiza al formulario del libro
     return render(request, 'catalogo/libro/libro_form.html', {'form': form, 'accion': 'Editar'})
 
+@login_required
 def eliminar_libros(request, pk):
+    perfil  = get_object_or_404(Perfil, user = request.user)
+    if perfil.rol.nombre != 'Bibliotecario':
+        return redirect('lista_libros')
     libro = get_object_or_404(Libro, pk=pk)
     if request.method == 'POST':
         #se elimina el libro
