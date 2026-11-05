@@ -2,19 +2,22 @@
 {% block content %}
 <h1 class="mb-4">Lista de Editoriales</h1>
 <!-- Botón para crear una nueva editorial -->
+{% if user.perfil.rol.nombre == 'Bibliotecario' and user.is_authenticated %}
 <div class="mb-3 text-end">
   <a href="{% url 'crear_editoriales' %}" class="btn btn-success">
     <i class="bi bi-plus-circle"></i> Nueva Editorial
   </a>
 </div>
-
+{% endif %}
 <table class="table table-striped table-hover">
   <thead class="table-dark">
     <tr>
       <th>Nombre</th>
       <th>País</th>
       <th>Sitio web</th>
+      {% if user.perfil.rol.nombre == 'Bibliotecario' and user.is_authenticated %}
       <th>Acciones</th>
+      {% endif %}
     </tr>
   </thead>
   <tbody>
@@ -30,6 +33,7 @@
         -
         {% endif %}
       </td>
+      {% if user.perfil.rol.nombre == 'Bibliotecario' and user.is_authenticated %}
       <td>
         <!-- Editar -->
         <a href="{% url 'editar_editoriales' e.id %}" class="btn btn-warning btn-sm" title="Editar">
@@ -39,6 +43,7 @@
         <a href="{% url 'eliminar_editoriales' e.id %}" class="btn btn-danger btn-sm" title="Eliminar">
           <i class="bi bi-trash"></i>
         </a>
+        {% endif %}
       </td>
     </tr>
     {% empty %}
